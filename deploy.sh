@@ -183,6 +183,7 @@ fi
 sed -i "s#<snitch_url>#$deadmanssnitch#g" monitoring/prometheus/prometheus-configs.yaml
 
 oc apply -n ${ODH_MONITORING_PROJECT} -f rhods-monitoring.yaml
+oc apply -n ${ODH_MONITORING_PROJECT} -f rhods-modelmesh-monitoring.yaml
 
 sed -i "s/<prometheus_proxy_secret>/$(openssl rand -hex 32)/g" monitoring/prometheus/prometheus-secrets.yaml
 sed -i "s/<alertmanager_proxy_secret>/$(openssl rand -hex 32)/g" monitoring/prometheus/prometheus-secrets.yaml
