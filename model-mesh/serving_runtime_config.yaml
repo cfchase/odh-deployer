@@ -16,12 +16,8 @@ data:
       annotations: {}
     spec:
       supportedModelFormats:
-        - name: openvino_ir
-          version: opset1
-          autoSelect: true
-        - name: onnx
-          version: '1'
-          autoSelect: true
+        - autoSelect: true
+          name: watson-nlp-custom
       # replicas will be overwritten by the model's replica
       replicas: 1
       protocolVersions:
@@ -30,25 +26,31 @@ data:
       grpcEndpoint: 'port:8085'
       grpcDataEndpoint: 'port:8001'
       containers:
-        - name: ovms
-          image: <openvino_image>
-          args:
-            - '--port=8001'
-            - '--rest_port=8888'
-            - '--config_path=/models/model_config_list.json'
-            - '--file_system_poll_wait_seconds=0'
-            - '--grpc_bind_address=127.0.0.1'
-            - '--rest_bind_address=127.0.0.1'
+        - name: watson-nlp-runtime
+          image: 'us.icr.io/watson-runtime/fmaas-runtime-ansible:0.0.3'
+          env:
+            - name: ACCEPT_LICENSE
+              value: 'true'
+            - name: LOG_LEVEL
+              value: info
+            - name: CAPACITY
+              value: '28000000000'
+            - name: DEFAULT_MODEL_SIZE
+              value: '1773741824'
+            - name: METRICS_PORT
+              value: '2113'
+            - name: GATEWAY_PORT
+              value: '8060'
+            - name: STRICT_RPC_MODE
+              value: 'false'
+            - name: HF_HOME
+              value: /tmp/
           resources:
-            # resources will be overwritten by the model's resource
+            limits:
+              cpu: 2
+              memory: 16Gi
             requests:
               cpu: 1
-              memory: 2
-            limits:
-              cpu: 1
-              memory: 2
-      builtInAdapter:
-        serverType: ovms
-        runtimeManagementPort: 8888
-        memBufferBytes: 134217728
-        modelLoadingTimeoutMillis: 90000
+              memory: 16Gi
+      storageHelper:
+        disabled: false
